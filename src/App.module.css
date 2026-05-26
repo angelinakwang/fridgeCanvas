@@ -3,7 +3,7 @@
   position: relative;
   overflow: hidden;
   cursor: grab;
-  background: #ede9e0;
+  background: #ffffff;
 }
 
 .inner {
@@ -16,9 +16,9 @@
 .grid {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, #c0bab2 1px, transparent 1px);
+  background-image: radial-gradient(circle, #d0d0d0 1px, transparent 1px);
   background-size: 28px 28px;
-  opacity: 0.4;
+  opacity: 0.5;
   pointer-events: none;
 }
 
