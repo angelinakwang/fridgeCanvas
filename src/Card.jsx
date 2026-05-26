@@ -27,7 +27,7 @@ export default function Card({ note, onMove, onDelete, hidden, scale, mode, onCa
     elRef.current.style.zIndex = 999;
     elRef.current.classList.add(styles.dragging);
 
-    const onMove = (me) => {
+    const onDragMove = (me) => {
       if (!dragState.current) return;
       const dx = (me.clientX - dragState.current.startX) / scale;
       const dy = (me.clientY - dragState.current.startY) / scale;
@@ -43,11 +43,11 @@ export default function Card({ note, onMove, onDelete, hidden, scale, mode, onCa
       dragState.current = null;
       elRef.current.style.zIndex = '';
       elRef.current.classList.remove(styles.dragging);
-      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mousemove', onDragMove);
       document.removeEventListener('mouseup', onUp);
     };
 
-    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mousemove', onDragMove);
     document.addEventListener('mouseup', onUp);
   }, [note, scale, onMove, mode]);
 
