@@ -4,7 +4,7 @@ import styles from './Toolbar.module.css';
 export default function Toolbar({ filter, onFilter, search, onSearch, noteCount, totalCount, onAdd, mode, onMode, onSticker }) {
   return (
     <div className={styles.toolbar}>
-      <h1 className={styles.logo}>my fridge</h1>
+      <h1 className={styles.logo}>commonplace</h1>
 
       <div className={styles.sep} />
 

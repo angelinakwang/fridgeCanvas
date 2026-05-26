@@ -208,7 +208,7 @@
 
 /* content */
 .title {
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   font-size: 17px;
   font-weight: 700;
   color: #1a1a1a;
@@ -222,7 +222,7 @@
 }
 
 .body {
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   font-size: 14px;
   color: #333;
   line-height: 1.45;
@@ -237,7 +237,7 @@
   position: absolute;
   bottom: 8px;
   left: 10px;
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   font-size: 11px;
   font-weight: 700;
   padding: 1px 8px;
@@ -255,7 +255,7 @@
   cursor: pointer;
   background: none;
   border: none;
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   line-height: 1;
   display: none;
   padding: 0;

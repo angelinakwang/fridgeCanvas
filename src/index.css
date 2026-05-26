@@ -24,7 +24,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   background: #ede9e0;
   height: 100vh;
   overflow: hidden;
@@ -36,4 +36,14 @@ body {
   height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+@font-face {
+  font-family: 'AppleGaramond';
+  src: url('./assets/fonts/AppleGaramond.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Stars';
+  src: url('/src/assets/fonts/Stars.ttf') format('truetype');
 }
