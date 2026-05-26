@@ -1,20 +1,40 @@
 import { useState, useEffect, useRef } from 'react';
-import { ALL_TAGS, ALL_STYLES, TAG_COLORS } from './data';
+import { ALL_TAGS, ALL_STYLES, TAG_COLORS, PAPER_COLORS, ACCENT_COLORS, PAPER_TEXTURES } from './data';
+import { resizeImage } from './imageUtils';
 import styles from './Modal.module.css';
 
-export default function AddNoteModal({ open, onClose, onAdd }) {
+const DEFAULT_TEXTURE = PAPER_TEXTURES[0]?.id ?? null;
+
+export default function AddNoteModal({ open, editNote, onClose, onAdd, onEdit }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [tag, setTag] = useState('wishlist');
   const [style, setStyle] = useState('sticky');
+  const [paperColor, setPaperColor] = useState(null);
+  const [accentColor, setAccentColor] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
+  const [paperTexture, setPaperTexture] = useState(DEFAULT_TEXTURE);
   const titleRef = useRef(null);
+  const fileRef = useRef(null);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (editNote) {
+      setTitle(editNote.title || '');
+      setBody(editNote.body || '');
+      setTag(editNote.tag || 'wishlist');
+      setStyle(editNote.style || 'sticky');
+      setPaperColor(editNote.paperColor || null);
+      setAccentColor(editNote.accentColor || null);
+      setImageUrl(editNote.imageUrl || null);
+      setPaperTexture(editNote.paperTexture !== undefined ? editNote.paperTexture : DEFAULT_TEXTURE);
+    } else {
       setTitle(''); setBody(''); setTag('wishlist'); setStyle('sticky');
-      setTimeout(() => titleRef.current?.focus(), 50);
+      setPaperColor(null); setAccentColor(null); setImageUrl(null);
+      setPaperTexture(DEFAULT_TEXTURE);
     }
-  }, [open]);
+    setTimeout(() => titleRef.current?.focus(), 50);
+  }, [open, editNote]);
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -22,18 +42,34 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
     return () => document.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  const handleImagePick = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = await resizeImage(file);
+    setImageUrl(url);
+  };
+
   const handleSave = () => {
-    if (!title.trim() && !body.trim()) { titleRef.current?.focus(); return; }
-    onAdd({ title: title.trim(), body: body.trim(), tag, style });
+    if (!title.trim() && !body.trim() && !imageUrl) { titleRef.current?.focus(); return; }
+    const fields = { title: title.trim(), body: body.trim(), tag, style, paperColor, accentColor, imageUrl, paperTexture };
+    if (editNote) {
+      onEdit(fields);
+    } else {
+      onAdd(fields);
+    }
     onClose();
   };
 
   if (!open) return null;
 
+  const isEditing = !!editNote;
+  const hasTape = style === 'torn' || style === 'envelope';
+  const accentLabel = hasTape ? 'tape color' : 'pin color';
+
   return (
     <div className={styles.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className={styles.modal}>
-        <h2 className={styles.heading}>pin a new note</h2>
+        <h2 className={styles.heading}>{isEditing ? 'edit note' : 'pin a new note'}</h2>
 
         <div className={styles.field}>
           <label>title <span className={styles.opt}>(optional)</span></label>
@@ -66,23 +102,109 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
         </div>
 
         <div className={styles.field}>
-          <label>style</label>
-          <div className={styles.chips}>
-            {ALL_STYLES.map(s => (
+          <label>paper</label>
+          <div className={styles.texturePicker}>
+            <button
+              className={[styles.textureOption, paperTexture === null ? styles.textureOptionActive : ''].join(' ')}
+              onClick={() => setPaperTexture(null)}
+            >
+              <div className={styles.textureNone}>none</div>
+            </button>
+            {PAPER_TEXTURES.map(t => (
               <button
-                key={s}
-                onClick={() => setStyle(s)}
-                className={[styles.chip, style === s ? styles.chipActive : ''].join(' ')}
+                key={t.id}
+                className={[styles.textureOption, paperTexture === t.id ? styles.textureOptionActive : ''].join(' ')}
+                onClick={() => setPaperTexture(t.id)}
+                title={t.label}
               >
-                {s}
+                <img src={t.src} alt={t.label} className={styles.textureThumbnail} />
+                <span className={styles.textureLabel}>{t.label}</span>
               </button>
             ))}
           </div>
         </div>
 
+        {!paperTexture && (
+          <>
+            <div className={styles.field}>
+              <label>style</label>
+              <div className={styles.chips}>
+                {ALL_STYLES.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setStyle(s)}
+                    className={[styles.chip, style === s ? styles.chipActive : ''].join(' ')}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label>paper color</label>
+              <div className={styles.swatches}>
+                <button
+                  className={[styles.swatch, styles.swatchAuto, paperColor === null ? styles.swatchActive : ''].join(' ')}
+                  onClick={() => setPaperColor(null)}
+                  title="tag default"
+                />
+                {PAPER_COLORS.map(c => (
+                  <button
+                    key={c}
+                    className={[styles.swatch, paperColor === c ? styles.swatchActive : ''].join(' ')}
+                    style={{ background: c }}
+                    onClick={() => setPaperColor(c)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label>{accentLabel}</label>
+              <div className={styles.swatches}>
+                <button
+                  className={[styles.swatch, styles.swatchAuto, accentColor === null ? styles.swatchActive : ''].join(' ')}
+                  onClick={() => setAccentColor(null)}
+                  title="default"
+                />
+                {ACCENT_COLORS.map(c => (
+                  <button
+                    key={c}
+                    className={[styles.swatch, accentColor === c ? styles.swatchActive : ''].join(' ')}
+                    style={{ background: c }}
+                    onClick={() => setAccentColor(c)}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        <div className={styles.field}>
+          <label>image <span className={styles.opt}>(optional)</span></label>
+          {imageUrl ? (
+            <div className={styles.imagePreviewWrap}>
+              <img src={imageUrl} alt="" className={styles.imagePreview} />
+              <button className={styles.imageRemove} onClick={() => { setImageUrl(null); if (fileRef.current) fileRef.current.value = ''; }}>×</button>
+            </div>
+          ) : (
+            <button className={styles.imageUpload} onClick={() => fileRef.current.click()}>
+              + upload image
+            </button>
+          )}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleImagePick}
+          />
+        </div>
+
         <div className={styles.actions}>
           <button className={styles.cancel} onClick={onClose}>cancel</button>
-          <button className={styles.save} onClick={handleSave}>pin it ✦</button>
+          <button className={styles.save} onClick={handleSave}>{isEditing ? 'update' : 'pin it'}</button>
         </div>
       </div>
     </div>

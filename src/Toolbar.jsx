@@ -1,10 +1,29 @@
 import { TAG_COLORS, ALL_TAGS } from './data';
 import styles from './Toolbar.module.css';
 
-export default function Toolbar({ filter, onFilter, search, onSearch, noteCount, totalCount, onAdd }) {
+export default function Toolbar({ filter, onFilter, search, onSearch, noteCount, totalCount, onAdd, mode, onMode, onSticker }) {
   return (
     <div className={styles.toolbar}>
-      <h1 className={styles.logo}>✦ my fridge</h1>
+      <h1 className={styles.logo}>commonplace</h1>
+
+      <div className={styles.sep} />
+
+      <div className={styles.modeToggle}>
+        <button
+          className={[styles.modeBtn, mode === 'drag' ? styles.modeBtnActive : ''].join(' ')}
+          onClick={() => onMode('drag')}
+          title="drag mode"
+        >
+          drag
+        </button>
+        <button
+          className={[styles.modeBtn, mode === 'edit' ? styles.modeBtnActive : ''].join(' ')}
+          onClick={() => onMode('edit')}
+          title="edit mode"
+        >
+          edit
+        </button>
+      </div>
 
       <div className={styles.sep} />
 
@@ -51,7 +70,10 @@ export default function Toolbar({ filter, onFilter, search, onSearch, noteCount,
         {filter === 'all' && !search ? `${totalCount} notes` : `${noteCount} / ${totalCount}`}
       </span>
 
-      <button className={styles.addBtn} onClick={onAdd}>+ add note</button>
+      <div className={styles.actions}>
+        <button className={styles.stickerBtn} onClick={onSticker}>+ sticker</button>
+        <button className={styles.addBtn} onClick={onAdd}>+ add note</button>
+      </div>
     </div>
   );
 }

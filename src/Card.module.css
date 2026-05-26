@@ -2,15 +2,63 @@
   position: absolute;
   cursor: move;
   user-select: none;
-  transition: box-shadow 0.15s;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: box-shadow 0.18s ease;
   z-index: 1;
 }
 
-.card:hover { z-index: 50; }
+.card:hover {
+  z-index: 50;
+  box-shadow: 8px 16px 32px rgba(0,0,0,0.2) !important;
+}
+
+.selected {
+  z-index: 51;
+}
 
 .dragging {
   z-index: 999 !important;
   box-shadow: 6px 12px 28px rgba(0,0,0,0.22) !important;
+  transition: none !important;
+}
+
+.handles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.rotateHandle {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: grab;
+  pointer-events: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.rotateHandle:active {
+  cursor: grabbing;
+}
+
+.resizeHandle {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #fff;
+  cursor: nwse-resize;
+  pointer-events: auto;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
 }
 
 .hidden {
@@ -20,6 +68,61 @@
 }
 
 /* styles */
+.card_textured {
+  width: 180px;
+  min-height: 220px;
+  padding: 32px 18px 36px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  box-shadow: none;
+}
+
+.card_textured:hover {
+  box-shadow: none !important;
+}
+
+.card_sticker {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0;
+  overflow: visible;
+  z-index: 100 !important;
+}
+
+.card_sticker:hover {
+  box-shadow: none !important;
+  transform: rotate(var(--rot, 0deg)) scale(1.12);
+  z-index: 100 !important;
+}
+
+.stickerImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.card_sticker .delete {
+  display: block;
+  opacity: 0;
+}
+
+.card_sticker:hover .delete,
+.card_sticker.selected .delete {
+  opacity: 1;
+}
+
+.editMode {
+  cursor: pointer !important;
+}
+
+.editMode:hover {
+  outline: 2px dashed rgba(0,0,0,0.25);
+  outline-offset: 3px;
+}
+
 .card_sticky {
   width: 168px;
   min-height: 148px;
@@ -81,19 +184,6 @@
   margin-top: 28px;
 }
 
-/* decorations */
-.pin {
-  position: absolute;
-  top: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-  z-index: 2;
-}
-
 .tape {
   position: absolute;
   top: -10px;
@@ -105,28 +195,49 @@
   border-radius: 1px;
 }
 
+/* image */
+.noteImage {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+  margin-bottom: 6px;
+  pointer-events: none;
+}
+
 /* content */
 .title {
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   font-size: 17px;
   font-weight: 700;
   color: #1a1a1a;
-  margin-bottom: 5px;
+  margin-top: 20px;
   line-height: 1.2;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  padding: 5%;
+  margin-right: 20px;
+  margin-left: 20px;
 }
 
 .body {
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   font-size: 14px;
   color: #333;
   line-height: 1.45;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 5%;
 }
 
 .tag {
   position: absolute;
   bottom: 8px;
   left: 10px;
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   font-size: 11px;
   font-weight: 700;
   padding: 1px 8px;
@@ -144,7 +255,7 @@
   cursor: pointer;
   background: none;
   border: none;
-  font-family: 'Caveat', cursive;
+  font-family: 'AppleGaramond', cursive;
   line-height: 1;
   display: none;
   padding: 0;
