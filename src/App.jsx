@@ -162,9 +162,10 @@ export default function App() {
 
   useEffect(() => {
     const handler = (e) => {
-      if (e.key === 'n' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        setModalOpen(true);
-      }
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key === 'n') setModalOpen(true);
+      if (e.key === 'd') setMode('drag');
+      if (e.key === 'e') setMode('edit');
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
@@ -214,7 +215,7 @@ export default function App() {
       </div>
 
       <div className={styles.hint}>
-        {mode === 'drag' ? 'drag to pan · scroll to zoom · press n to add' : 'click a note to edit · drag canvas to pan'}
+        {mode === 'drag' ? 'drag to pan · scroll to zoom · n to add · e to edit' : 'click a note to edit · d to drag'}
       </div>
 
       {stickerPickerOpen && (
