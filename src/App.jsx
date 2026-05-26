@@ -5,13 +5,17 @@ import { useLocalStorage } from './useLocalStorage';
 import Card from './Card';
 import Toolbar from './Toolbar';
 import AddNoteModal from './AddNoteModal';
+import StickerPicker from './StickerPicker';
 import styles from './App.module.css';
 
 export default function App() {
   const [notes, setNotes] = useLocalStorage('fridge-notes', INITIAL_NOTES);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [mode, setMode] = useState('drag');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState(null);
+  const [stickerPickerOpen, setStickerPickerOpen] = useState(false);
   const [scale, setScale] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
 
@@ -49,6 +53,32 @@ export default function App() {
       rot: (Math.random() - 0.5) * 4.5,
     };
     setNotes(prev => [...prev, note]);
+  }, [pan, scale, setNotes]);
+
+  const handleEdit = useCallback((fields) => {
+    if (!editingNote) return;
+    setNotes(prev => prev.map(n => n.id === editingNote.id ? { ...n, ...fields } : n));
+    setEditingNote(null);
+  }, [editingNote, setNotes]);
+
+  const handleCardClick = useCallback((note) => {
+    if (mode === 'edit' && note.style !== 'sticker') setEditingNote(note);
+  }, [mode]);
+
+  const handleAddSticker = useCallback((emoji) => {
+    const note = {
+      id: uuidv4(),
+      style: 'sticker',
+      emoji,
+      tag: 'idea',
+      title: '',
+      body: '',
+      x: Math.max(0, (300 - pan.x) / scale + Math.random() * 400),
+      y: Math.max(0, (150 - pan.y) / scale + Math.random() * 200),
+      rot: (Math.random() - 0.5) * 8,
+    };
+    setNotes(prev => [...prev, note]);
+    setStickerPickerOpen(false);
   }, [pan, scale, setNotes]);
 
   const handleCanvasMouseDown = useCallback((e) => {
@@ -120,6 +150,9 @@ export default function App() {
         noteCount={visibleCount}
         totalCount={notes.length}
         onAdd={() => setModalOpen(true)}
+        mode={mode}
+        onMode={setMode}
+        onSticker={() => setStickerPickerOpen(true)}
       />
 
       <div ref={canvasRef} className={styles.canvas} onMouseDown={handleCanvasMouseDown}>
@@ -135,6 +168,8 @@ export default function App() {
               onDelete={handleDelete}
               hidden={!isVisible(note)}
               scale={scale}
+              mode={mode}
+              onCardClick={handleCardClick}
             />
           ))}
         </div>
@@ -147,9 +182,21 @@ export default function App() {
         <button className={styles.zoomBtn} style={{ fontSize: 14 }} onClick={() => { setScale(1); setPan({ x: 0, y: 0 }); }}>⌂</button>
       </div>
 
-      <div className={styles.hint}>drag to pan · scroll to zoom · press n to add</div>
+      <div className={styles.hint}>
+        {mode === 'drag' ? 'drag to pan · scroll to zoom · press n to add' : 'click a note to edit · drag canvas to pan'}
+      </div>
 
-      <AddNoteModal open={modalOpen} onClose={() => setModalOpen(false)} onAdd={handleAdd} />
+      {stickerPickerOpen && (
+        <StickerPicker onPick={handleAddSticker} onClose={() => setStickerPickerOpen(false)} />
+      )}
+
+      <AddNoteModal
+        open={modalOpen || !!editingNote}
+        editNote={editingNote}
+        onClose={() => { setModalOpen(false); setEditingNote(null); }}
+        onAdd={handleAdd}
+        onEdit={handleEdit}
+      />
     </>
   );
 }

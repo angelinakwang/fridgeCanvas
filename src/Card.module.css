@@ -40,6 +40,36 @@
   box-shadow: none !important;
 }
 
+.card_sticker {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 4px;
+  width: auto;
+  min-height: auto;
+}
+
+.card_sticker:hover {
+  box-shadow: none !important;
+  transform: rotate(var(--rot, 0deg)) scale(1.12);
+}
+
+.stickerEmoji {
+  font-size: 48px;
+  line-height: 1;
+  display: block;
+  user-select: none;
+}
+
+.editMode {
+  cursor: pointer !important;
+}
+
+.editMode:hover {
+  outline: 2px dashed rgba(0,0,0,0.25);
+  outline-offset: 3px;
+}
+
 .card_sticky {
   width: 168px;
   min-height: 148px;

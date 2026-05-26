@@ -23,7 +23,7 @@ function resizeImage(file, maxPx = 480) {
 
 const DEFAULT_TEXTURE = PAPER_TEXTURES[0]?.id ?? null;
 
-export default function AddNoteModal({ open, onClose, onAdd }) {
+export default function AddNoteModal({ open, editNote, onClose, onAdd, onEdit }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [tag, setTag] = useState('wishlist');
@@ -36,13 +36,23 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
   const fileRef = useRef(null);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (editNote) {
+      setTitle(editNote.title || '');
+      setBody(editNote.body || '');
+      setTag(editNote.tag || 'wishlist');
+      setStyle(editNote.style || 'sticky');
+      setPaperColor(editNote.paperColor || null);
+      setAccentColor(editNote.accentColor || null);
+      setImageUrl(editNote.imageUrl || null);
+      setPaperTexture(editNote.paperTexture !== undefined ? editNote.paperTexture : DEFAULT_TEXTURE);
+    } else {
       setTitle(''); setBody(''); setTag('wishlist'); setStyle('sticky');
       setPaperColor(null); setAccentColor(null); setImageUrl(null);
       setPaperTexture(DEFAULT_TEXTURE);
-      setTimeout(() => titleRef.current?.focus(), 50);
     }
-  }, [open]);
+    setTimeout(() => titleRef.current?.focus(), 50);
+  }, [open, editNote]);
 
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -59,19 +69,25 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
 
   const handleSave = () => {
     if (!title.trim() && !body.trim() && !imageUrl) { titleRef.current?.focus(); return; }
-    onAdd({ title: title.trim(), body: body.trim(), tag, style, paperColor, accentColor, imageUrl, paperTexture });
+    const fields = { title: title.trim(), body: body.trim(), tag, style, paperColor, accentColor, imageUrl, paperTexture };
+    if (editNote) {
+      onEdit(fields);
+    } else {
+      onAdd(fields);
+    }
     onClose();
   };
 
   if (!open) return null;
 
+  const isEditing = !!editNote;
   const hasTape = style === 'torn' || style === 'envelope';
   const accentLabel = hasTape ? 'tape color' : 'pin color';
 
   return (
     <div className={styles.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className={styles.modal}>
-        <h2 className={styles.heading}>pin a new note</h2>
+        <h2 className={styles.heading}>{isEditing ? 'edit note' : 'pin a new note'}</h2>
 
         <div className={styles.field}>
           <label>title <span className={styles.opt}>(optional)</span></label>
@@ -106,7 +122,6 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
         <div className={styles.field}>
           <label>paper</label>
           <div className={styles.texturePicker}>
-            {/* "none" option */}
             <button
               className={[styles.textureOption, paperTexture === null ? styles.textureOptionActive : ''].join(' ')}
               onClick={() => setPaperTexture(null)}
@@ -127,7 +142,6 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
           </div>
         </div>
 
-        {/* style + color only shown when no texture is selected */}
         {!paperTexture && (
           <>
             <div className={styles.field}>
@@ -190,7 +204,7 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
           {imageUrl ? (
             <div className={styles.imagePreviewWrap}>
               <img src={imageUrl} alt="" className={styles.imagePreview} />
-              <button className={styles.imageRemove} onClick={() => { setImageUrl(null); fileRef.current.value = ''; }}>×</button>
+              <button className={styles.imageRemove} onClick={() => { setImageUrl(null); if (fileRef.current) fileRef.current.value = ''; }}>×</button>
             </div>
           ) : (
             <button className={styles.imageUpload} onClick={() => fileRef.current.click()}>
@@ -208,7 +222,7 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
 
         <div className={styles.actions}>
           <button className={styles.cancel} onClick={onClose}>cancel</button>
-          <button className={styles.save} onClick={handleSave}>pin it ✦</button>
+          <button className={styles.save} onClick={handleSave}>{isEditing ? 'update ✦' : 'pin it ✦'}</button>
         </div>
       </div>
     </div>

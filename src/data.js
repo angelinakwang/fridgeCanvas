@@ -2,6 +2,14 @@ import paper1 from './assets/paper-1.png';
 import paper2 from './assets/paper-2.png';
 import paper3 from './assets/paper-3.png';
 
+export const STICKER_EMOJIS = [
+  '🌸', '🌺', '🌻', '🌼', '🌷', '🍀', '🍁', '🍂',
+  '🦋', '🐝', '🌙', '⭐', '💫', '✨', '🌈', '☁️',
+  '🎀', '🎨', '📷', '💌', '🍓', '🧁', '🫖', '🕯️',
+  '🪴', '🐚', '🌊', '🫧', '🪷', '🫶', '💝', '🦢',
+  '🍋', '🫐', '🍄', '🌵', '🦔', '🐇', '🦭', '🐾',
+];
+
 export const PAPER_TEXTURES = [
   { id: 'paper-1', src: paper1, label: 'paper 1' },
   { id: 'paper-2', src: paper2, label: 'paper 2' },
