@@ -14,8 +14,7 @@
 }
 
 .selected {
-  z-index: 100 !important;
-  
+  z-index: 51;
 }
 
 .dragging {
@@ -40,7 +39,6 @@
   height: 14px;
   border-radius: 50%;
   background: #fff;
-  
   cursor: grab;
   pointer-events: auto;
   box-shadow: 0 1px 4px rgba(0,0,0,0.15);
@@ -89,12 +87,13 @@
   box-shadow: none !important;
   padding: 0;
   overflow: visible;
-  z-index: 60 !important;
+  z-index: 100 !important;
 }
 
 .card_sticker:hover {
   box-shadow: none !important;
-  z-index: 60 !important;
+  transform: rotate(var(--rot, 0deg)) scale(1.12);
+  z-index: 100 !important;
 }
 
 .stickerImg {
@@ -113,15 +112,6 @@
 .card_sticker:hover .delete,
 .card_sticker.selected .delete {
   opacity: 1;
-}
-
-.stickerImage {
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
-  display: block;
-  pointer-events: none;
-  user-select: none;
 }
 
 .editMode {
@@ -194,70 +184,6 @@
   margin-top: 28px;
 }
 
-/* rotate / resize handles */
-.rotHandle {
-  position: absolute;
-  top: -26px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 20px;
-  background: rgba(30,30,30,0.75);
-  border-radius: 50%;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  cursor: grab;
-  font-size: 13px;
-  color: rgba(255,255,255,0.9);
-  z-index: 10;
-  user-select: none;
-  backdrop-filter: blur(2px);
-}
-
-.card:hover .rotHandle { display: flex; }
-.rotHandle:hover { background: rgba(30,30,30,0.92); }
-.rotHandle:active { cursor: grabbing; }
-
-.resizeHandle {
-  position: absolute;
-  bottom: 5px;
-  right: 5px;
-  width: 14px;
-  height: 14px;
-  cursor: se-resize;
-  display: none;
-  z-index: 10;
-}
-
-/* corner-grip lines instead of a filled square */
-.resizeHandle::before,
-.resizeHandle::after {
-  content: '';
-  position: absolute;
-  background: rgba(0,0,0,0.3);
-  border-radius: 1px;
-}
-.resizeHandle::before { right: 0; bottom: 4px; width: 100%; height: 1.5px; }
-.resizeHandle::after  { right: 4px; bottom: 0; width: 1.5px; height: 100%; }
-
-.card:hover .resizeHandle { display: block; }
-.resizeHandle:hover::before,
-.resizeHandle:hover::after { background: rgba(0,0,0,0.55); }
-
-/* decorations */
-.pin {
-  position: absolute;
-  top: -7px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3), inset 0 -1px 2px rgba(0,0,0,0.2);
-  z-index: 2;
-}
-
 .tape {
   position: absolute;
   top: -10px;
@@ -286,7 +212,7 @@
   font-size: 17px;
   font-weight: 700;
   color: #1a1a1a;
-  margin-bottom: 5px;
+  margin-bottom: 1px;
   line-height: 1.2;
   overflow-wrap: break-word;
   word-break: break-word;
