@@ -12,7 +12,9 @@
   background: #faf9f5;
   border-radius: 6px;
   padding: 26px 28px;
-  width: 360px;
+  width: 400px;
+  max-height: 88vh;
+  overflow-y: auto;
   box-shadow: 5px 10px 30px rgba(0,0,0,0.22);
   font-family: 'Caveat', cursive;
 }
@@ -89,6 +91,81 @@
   border-color: #1a1a1a;
   background: #1a1a1a;
   color: #fff;
+}
+
+/* color swatches */
+.swatches {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  transition: outline-color 0.12s;
+  flex-shrink: 0;
+}
+
+.swatch:hover { outline-color: #aaa; }
+
+.swatchActive { outline-color: #1a1a1a !important; }
+
+.swatchAuto {
+  background: linear-gradient(135deg, #f0ece3 50%, #d4d0c8 50%);
+}
+
+/* image upload */
+.imageUpload {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  color: #999;
+  border: 1.5px dashed #ddd;
+  border-radius: 6px;
+  background: transparent;
+  padding: 10px 16px;
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.13s, color 0.13s;
+}
+
+.imageUpload:hover { border-color: #aaa; color: #666; }
+
+.imagePreviewWrap {
+  position: relative;
+  display: inline-block;
+}
+
+.imagePreview {
+  max-width: 100%;
+  max-height: 140px;
+  border-radius: 4px;
+  display: block;
+  object-fit: cover;
+}
+
+.imageRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .actions {

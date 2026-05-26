@@ -2,6 +2,10 @@ import { useRef, useCallback } from 'react';
 import { TAG_COLORS, INDEX_BORDERS, PIN_COLORS } from './data';
 import styles from './Card.module.css';
 
+function hashId(id) {
+  return id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+}
+
 export default function Card({ note, onMove, onDelete, hidden, scale }) {
   const dragState = useRef(null);
   const elRef = useRef(null);
@@ -52,13 +56,18 @@ export default function Card({ note, onMove, onDelete, hidden, scale }) {
     hidden ? styles.hidden : '',
   ].join(' ');
 
+  const paperBg = note.paperColor || (note.style === 'sticky' ? colors.bg : null);
+
   const cardStyle = {
     left: note.x,
     top: note.y,
-    transform: `rotate(${note.rot || 0}deg)`,
-    ...(note.style === 'sticky' ? { background: colors.bg } : {}),
-    ...(note.style === 'index'  ? { borderTopColor: INDEX_BORDERS[note.tag] || '#ccc' } : {}),
+    '--rot': `${note.rot || 0}deg`,
+    ...(paperBg ? { background: paperBg } : {}),
+    ...(note.style === 'index' ? { borderTopColor: INDEX_BORDERS[note.tag] || '#ccc' } : {}),
   };
+
+  const pinColor = note.accentColor || PIN_COLORS[hashId(note.id) % PIN_COLORS.length];
+  const tapeStyle = note.accentColor ? { background: note.accentColor, opacity: 0.7 } : undefined;
 
   return (
     <div
@@ -69,10 +78,20 @@ export default function Card({ note, onMove, onDelete, hidden, scale }) {
     >
       {/* decorations */}
       {(note.style === 'sticky' || note.style === 'index') && (
-        <div className={styles.pin} style={{ background: PIN_COLORS[parseInt(note.id) % PIN_COLORS.length] }} />
+        <div className={styles.pin} style={{ background: pinColor }} />
       )}
       {(note.style === 'torn' || note.style === 'envelope') && (
-        <div className={styles.tape} />
+        <div className={styles.tape} style={tapeStyle} />
+      )}
+
+      {/* image */}
+      {note.imageUrl && (
+        <img
+          src={note.imageUrl}
+          alt=""
+          className={styles.noteImage}
+          draggable={false}
+        />
       )}
 
       {/* content */}

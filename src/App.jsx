@@ -17,6 +17,11 @@ export default function App() {
 
   const panState = useRef(null);
   const canvasRef = useRef(null);
+  const scaleRef = useRef(1);
+  const panRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => { scaleRef.current = scale; }, [scale]);
+  useEffect(() => { panRef.current = pan; }, [pan]);
 
   const isVisible = useCallback((note) => {
     const tagOk = filter === 'all' || note.tag === filter;
@@ -35,10 +40,10 @@ export default function App() {
     setNotes(prev => prev.filter(n => n.id !== id));
   }, [setNotes]);
 
-  const handleAdd = useCallback(({ title, body, tag, style }) => {
+  const handleAdd = useCallback(({ title, body, tag, style, paperColor, accentColor, imageUrl }) => {
     const note = {
       id: uuidv4(),
-      title, body, tag, style,
+      title, body, tag, style, paperColor, accentColor, imageUrl,
       x: Math.max(0, (200 - pan.x) / scale + Math.random() * 300),
       y: Math.max(0, (120 - pan.y) / scale + Math.random() * 180),
       rot: (Math.random() - 0.5) * 4.5,
@@ -71,8 +76,21 @@ export default function App() {
 
   const handleWheel = useCallback((e) => {
     e.preventDefault();
-    const delta = e.deltaY < 0 ? 0.08 : -0.08;
-    setScale(s => Math.min(2.2, Math.max(0.25, s + delta)));
+    const rect = canvasRef.current.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const factor = e.deltaY < 0 ? 1.08 : 1 / 1.08;
+    const prev = scaleRef.current;
+    const next = Math.min(2.2, Math.max(0.25, prev * factor));
+    const p = panRef.current;
+    const newPan = {
+      x: mx - (mx - p.x) * (next / prev),
+      y: my - (my - p.y) * (next / prev),
+    };
+    scaleRef.current = next;
+    panRef.current = newPan;
+    setScale(next);
+    setPan(newPan);
   }, []);
 
   useEffect(() => {

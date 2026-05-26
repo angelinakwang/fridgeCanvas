@@ -1,3 +1,13 @@
+export const PAPER_COLORS = [
+  '#faf7ee', '#fef0f5', '#edf3fe', '#ecf7ef',
+  '#fef9e7', '#f3eefe', '#f5f5f5', '#1f1f1f',
+];
+
+export const ACCENT_COLORS = [
+  '#e8a0b4', '#fac775', '#9fe1cb', '#b5d4f4',
+  '#cecbf6', '#c0dd97', '#e05c5c', '#4a90d9', '#1a1a1a',
+];
+
 export const TAG_COLORS = {
   wishlist: { bg: '#fce4ec', tag: '#e8a0b4', tagText: '#4a1528' },
   quote:    { bg: '#e3f0fd', tag: '#b5d4f4', tagText: '#042c53' },
