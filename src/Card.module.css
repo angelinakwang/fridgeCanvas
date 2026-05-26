@@ -33,7 +33,11 @@
   padding: 32px 18px 36px;
   background-size: 100% 100%;
   background-repeat: no-repeat;
-  box-shadow: 3px 5px 16px rgba(0,0,0,0.14);
+  box-shadow: none;
+}
+
+.card_textured:hover {
+  box-shadow: none !important;
 }
 
 .card_sticky {
