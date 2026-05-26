@@ -66,6 +66,10 @@ export default function App() {
     });
   }, [setNotes]);
 
+  const handleUpdate = useCallback((id, fields) => {
+    setNotes(prev => prev.map(n => n.id === id ? { ...n, ...fields } : n));
+  }, [setNotes]);
+
   const handleDelete = useCallback((id) => {
     setNotes(prev => prev.filter(n => n.id !== id));
   }, [setNotes]);
@@ -191,6 +195,7 @@ export default function App() {
               key={note.id}
               note={note}
               onMove={handleMove}
+              onUpdate={handleUpdate}
               onDelete={handleDelete}
               hidden={!isVisible(note)}
               scale={scale}
