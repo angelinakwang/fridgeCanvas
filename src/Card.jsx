@@ -1,111 +1,184 @@
 import { useRef, useCallback } from 'react';
 import { TAG_COLORS, INDEX_BORDERS, PAPER_TEXTURES } from './data';
+import { getCardSize } from './cardSizes';
 import styles from './Card.module.css';
 
-function hashId(id) {
-  return id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-}
+const DRAG_THRESHOLD = 4;
 
-export default function Card({ note, onMove, onUpdate, onDelete, hidden, scale, mode, onCardClick }) {
+export default function Card({
+  note,
+  onMove,
+  onUpdate,
+  onDelete,
+  hidden,
+  scale,
+  mode,
+  onCardClick,
+  selected,
+  onSelect,
+}) {
   const dragState = useRef(null);
   const elRef = useRef(null);
   const colors = TAG_COLORS[note.tag] || TAG_COLORS.idea;
+  const { width, height } = getCardSize(note);
+  const posX = Number(note.x) || 0;
+  const posY = Number(note.y) || 0;
+
+  const baseTransform = `rotate(${note.rot || 0}deg)`;
 
   const handleMouseDown = useCallback((e) => {
     if (e.target.dataset.delete || e.target.dataset.handle) return;
-    if (mode === 'edit') return;
+    if (mode === 'edit' && note.style !== 'sticker') return;
     e.stopPropagation();
     e.preventDefault();
+    onSelect(note.id);
 
-    dragState.current = { startX: e.clientX, startY: e.clientY, startNX: note.x, startNY: note.y };
-    elRef.current.style.zIndex = 999;
-    elRef.current.classList.add(styles.dragging);
-
-    const onDragMove = (me) => {
-      if (!dragState.current) return;
-      const dx = (me.clientX - dragState.current.startX) / scale;
-      const dy = (me.clientY - dragState.current.startY) / scale;
-      elRef.current.style.left = (dragState.current.startNX + dx) + 'px';
-      elRef.current.style.top  = (dragState.current.startNY + dy) + 'px';
+    const el = elRef.current;
+    dragState.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      startNX: posX,
+      startNY: posY,
+      moved: false,
     };
 
-    const onUp = (me) => {
+    el.style.zIndex = '999';
+    el.classList.add(styles.dragging);
+
+    const handlePointerMove = (me) => {
       if (!dragState.current) return;
-      const dx = (me.clientX - dragState.current.startX) / scale;
-      const dy = (me.clientY - dragState.current.startY) / scale;
-      onMove(note.id, dragState.current.startNX + dx, dragState.current.startNY + dy);
+      const dx = me.clientX - dragState.current.startX;
+      const dy = me.clientY - dragState.current.startY;
+      if (!dragState.current.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+      dragState.current.moved = true;
+      const canvasDx = dx / scale;
+      const canvasDy = dy / scale;
+      el.style.left = (dragState.current.startNX + canvasDx) + 'px';
+      el.style.top = (dragState.current.startNY + canvasDy) + 'px';
+    };
+
+    const handlePointerUp = (me) => {
+      if (!dragState.current) return;
+      const dx = me.clientX - dragState.current.startX;
+      const dy = me.clientY - dragState.current.startY;
+      const moved = dragState.current.moved || Math.hypot(dx, dy) >= DRAG_THRESHOLD;
+
+      if (moved) {
+        const x = dragState.current.startNX + dx / scale;
+        const y = dragState.current.startNY + dy / scale;
+        onMove(note.id, x, y);
+      }
+
       dragState.current = null;
-      elRef.current.style.zIndex = '';
-      elRef.current.classList.remove(styles.dragging);
-      document.removeEventListener('mousemove', onDragMove);
-      document.removeEventListener('mouseup', onUp);
+      el.style.zIndex = '';
+      el.classList.remove(styles.dragging);
+      document.removeEventListener('mousemove', handlePointerMove);
+      document.removeEventListener('mouseup', handlePointerUp);
     };
 
-    document.addEventListener('mousemove', onDragMove);
-    document.addEventListener('mouseup', onUp);
-  }, [note, scale, onMove, mode]);
-
-  const handleRotDown = useCallback((e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const rect = elRef.current.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI);
-    const startRot = note.rot || 0;
-    let live = startRot;
-
-    const onRotMove = (me) => {
-      const angle = Math.atan2(me.clientY - cy, me.clientX - cx) * (180 / Math.PI);
-      live = startRot + (angle - startAngle);
-      elRef.current.style.setProperty('--rot', `${live}deg`);
-    };
-    const onRotUp = () => {
-      onUpdate(note.id, { rot: live });
-      document.removeEventListener('mousemove', onRotMove);
-      document.removeEventListener('mouseup', onRotUp);
-    };
-    document.addEventListener('mousemove', onRotMove);
-    document.addEventListener('mouseup', onRotUp);
-  }, [note, onUpdate]);
-
-  const handleResizeDown = useCallback((e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const startX = e.clientX;
-    const startW = elRef.current.getBoundingClientRect().width / scale;
-    let live = startW;
-
-    const onResizeMove = (me) => {
-      live = Math.max(120, startW + (me.clientX - startX) / scale);
-      elRef.current.style.width = `${live}px`;
-    };
-    const onResizeUp = () => {
-      onUpdate(note.id, { width: live });
-      document.removeEventListener('mousemove', onResizeMove);
-      document.removeEventListener('mouseup', onResizeUp);
-    };
-    document.addEventListener('mousemove', onResizeMove);
-    document.addEventListener('mouseup', onResizeUp);
-  }, [note, scale, onUpdate]);
+    document.addEventListener('mousemove', handlePointerMove);
+    document.addEventListener('mouseup', handlePointerUp);
+  }, [note, posX, posY, scale, onMove, onSelect, mode]);
 
   const handleClick = useCallback(() => {
     if (mode === 'edit' && note.style !== 'sticker') onCardClick(note);
   }, [mode, note, onCardClick]);
 
-  // sticker cards
+  const handleRotateStart = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const el = elRef.current;
+    const rect = el.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const startRot = note.rot || 0;
+    const startAngle = Math.atan2(e.clientY - cy, e.clientX - cx) * (180 / Math.PI);
+
+    const handlePointerMove = (me) => {
+      const angle = Math.atan2(me.clientY - cy, me.clientX - cx) * (180 / Math.PI);
+      const rot = startRot + (angle - startAngle);
+      el.style.transform = `rotate(${rot}deg)`;
+    };
+
+    const handlePointerUp = (me) => {
+      const angle = Math.atan2(me.clientY - cy, me.clientX - cx) * (180 / Math.PI);
+      const rot = startRot + (angle - startAngle);
+      el.style.transform = '';
+      onUpdate(note.id, { rot: Math.round(rot * 10) / 10 });
+      document.removeEventListener('mousemove', handlePointerMove);
+      document.removeEventListener('mouseup', handlePointerUp);
+    };
+
+    document.addEventListener('mousemove', handlePointerMove);
+    document.addEventListener('mouseup', handlePointerUp);
+  }, [note, onUpdate]);
+
+  const handleResizeStart = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const el = elRef.current;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = width;
+    const startH = height;
+    const minW = note.style === 'sticker' ? 24 : 80;
+    const minH = note.style === 'sticker' ? 24 : 60;
+
+    const handlePointerMove = (me) => {
+      const newW = Math.max(minW, startW + (me.clientX - startX) / scale);
+      const newH = Math.max(minH, startH + (me.clientY - startY) / scale);
+      el.style.width = newW + 'px';
+      el.style.height = newH + 'px';
+    };
+
+    const handlePointerUp = (me) => {
+      const newW = Math.max(minW, startW + (me.clientX - startX) / scale);
+      const newH = Math.max(minH, startH + (me.clientY - startY) / scale);
+      onUpdate(note.id, { width: Math.round(newW), height: Math.round(newH) });
+      document.removeEventListener('mousemove', handlePointerMove);
+      document.removeEventListener('mouseup', handlePointerUp);
+    };
+
+    document.addEventListener('mousemove', handlePointerMove);
+    document.addEventListener('mouseup', handlePointerUp);
+  }, [note, width, height, scale, onUpdate]);
+
+  const sizeStyle = { width, height, minHeight: height };
+  const transformStyle = { transform: baseTransform, '--rot': `${note.rot || 0}deg` };
+
+  const handles = selected && !hidden && mode === 'drag' && (
+    <div className={styles.handles}>
+      <div
+        className={styles.rotateHandle}
+        data-handle="rotate"
+        onMouseDown={handleRotateStart}
+        title="Rotate"
+      />
+      <div
+        className={styles.resizeHandle}
+        data-handle="resize"
+        onMouseDown={handleResizeStart}
+        title="Resize"
+      />
+    </div>
+  );
+
   if (note.style === 'sticker') {
+    if (!note.imageUrl) return null;
     return (
       <div
         ref={elRef}
-        className={[styles.card, styles.card_sticker, hidden ? styles.hidden : ''].join(' ')}
-        style={{ left: note.x, top: note.y, '--rot': `${note.rot || 0}deg` }}
+        className={[
+          styles.card,
+          styles.card_sticker,
+          hidden ? styles.hidden : '',
+          selected ? styles.selected : '',
+        ].join(' ')}
+        style={{ left: posX, top: posY, ...sizeStyle, ...transformStyle }}
         onMouseDown={handleMouseDown}
       >
-        {note.stickerSrc
-          ? <img src={note.stickerSrc} alt="" className={styles.stickerImage} draggable={false} />
-          : <span className={styles.stickerEmoji}>{note.emoji}</span>
-        }
+        <img src={note.imageUrl} alt="" className={styles.stickerImg} draggable={false} />
+        {handles}
         <button
           className={styles.delete}
           data-delete="true"
@@ -124,15 +197,16 @@ export default function Card({ note, onMove, onUpdate, onDelete, hidden, scale, 
     texture ? styles.card_textured : styles[`card_${note.style}`],
     hidden ? styles.hidden : '',
     mode === 'edit' ? styles.editMode : '',
+    selected ? styles.selected : '',
   ].join(' ');
 
   const paperBg = note.paperColor || (note.style === 'sticky' ? colors.bg : null);
 
   const cardStyle = {
-    left: note.x,
-    top: note.y,
-    '--rot': `${note.rot || 0}deg`,
-    ...(note.width ? { width: note.width } : {}),
+    left: posX,
+    top: posY,
+    ...sizeStyle,
+    ...transformStyle,
     ...(texture
       ? { backgroundImage: `url(${texture.src})` }
       : {
@@ -152,46 +226,23 @@ export default function Card({ note, onMove, onUpdate, onDelete, hidden, scale, 
       onMouseDown={handleMouseDown}
       onClick={handleClick}
     >
-      {/* rotate handle */}
-      {mode === 'drag' && (
-        <div
-          className={styles.rotHandle}
-          data-handle="true"
-          onMouseDown={handleRotDown}
-          title="rotate"
-        >↻</div>
-      )}
-
-      {/* resize handle */}
-      {mode === 'drag' && (
-        <div
-          className={styles.resizeHandle}
-          data-handle="true"
-          onMouseDown={handleResizeDown}
-          title="resize"
-        />
-      )}
-
-      {/* tape decoration */}
       {!texture && (note.style === 'torn' || note.style === 'envelope') && (
         <div className={styles.tape} style={tapeStyle} />
       )}
 
-      {/* image */}
       {note.imageUrl && (
         <img src={note.imageUrl} alt="" className={styles.noteImage} draggable={false} />
       )}
 
-      {/* content */}
       {note.title && <div className={styles.title}>{note.title}</div>}
       <div className={styles.body}>{note.body}</div>
 
-      {/* tag */}
       <div className={styles.tag} style={{ background: colors.tag, color: colors.tagText }}>
         #{note.tag}
       </div>
 
-      {/* delete */}
+      {handles}
+
       <button
         className={styles.delete}
         data-delete="true"

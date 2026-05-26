@@ -1,25 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { ALL_TAGS, ALL_STYLES, TAG_COLORS, PAPER_COLORS, ACCENT_COLORS, PAPER_TEXTURES } from './data';
+import { resizeImage } from './imageUtils';
 import styles from './Modal.module.css';
-
-function resizeImage(file, maxPx = 480) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const img = new Image();
-      img.onload = () => {
-        const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1);
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(img.width * ratio);
-        canvas.height = Math.round(img.height * ratio);
-        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        resolve(canvas.toDataURL('image/jpeg', 0.78));
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
 
 const DEFAULT_TEXTURE = PAPER_TEXTURES[0]?.id ?? null;
 
@@ -222,7 +204,7 @@ export default function AddNoteModal({ open, editNote, onClose, onAdd, onEdit })
 
         <div className={styles.actions}>
           <button className={styles.cancel} onClick={onClose}>cancel</button>
-          <button className={styles.save} onClick={handleSave}>{isEditing ? 'update ✦' : 'pin it ✦'}</button>
+          <button className={styles.save} onClick={handleSave}>{isEditing ? 'update' : 'pin it'}</button>
         </div>
       </div>
     </div>

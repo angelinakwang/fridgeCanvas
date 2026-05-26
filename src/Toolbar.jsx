@@ -4,7 +4,7 @@ import styles from './Toolbar.module.css';
 export default function Toolbar({ filter, onFilter, search, onSearch, noteCount, totalCount, onAdd, mode, onMode, onSticker }) {
   return (
     <div className={styles.toolbar}>
-      <h1 className={styles.logo}>✦ my fridge</h1>
+      <h1 className={styles.logo}>my fridge</h1>
 
       <div className={styles.sep} />
 
@@ -14,14 +14,14 @@ export default function Toolbar({ filter, onFilter, search, onSearch, noteCount,
           onClick={() => onMode('drag')}
           title="drag mode"
         >
-          ✥ drag
+          drag
         </button>
         <button
           className={[styles.modeBtn, mode === 'edit' ? styles.modeBtnActive : ''].join(' ')}
           onClick={() => onMode('edit')}
           title="edit mode"
         >
-          ✎ edit
+          edit
         </button>
       </div>
 
@@ -71,7 +71,7 @@ export default function Toolbar({ filter, onFilter, search, onSearch, noteCount,
       </span>
 
       <div className={styles.actions}>
-        <button className={styles.stickerBtn} onClick={onSticker}>🎀 sticker</button>
+        <button className={styles.stickerBtn} onClick={onSticker}>+ sticker</button>
         <button className={styles.addBtn} onClick={onAdd}>+ add note</button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { INITIAL_NOTES } from './data';
+import { getCardSize } from './cardSizes';
 import { useLocalStorage } from './useLocalStorage';
 import Card from './Card';
 import Toolbar from './Toolbar';
@@ -13,6 +14,7 @@ export default function App() {
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [mode, setMode] = useState('drag');
+  const [selectedId, setSelectedId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingNote, setEditingNote] = useState(null);
   const [stickerPickerOpen, setStickerPickerOpen] = useState(false);
@@ -37,29 +39,31 @@ export default function App() {
   const visibleCount = notes.filter(isVisible).length;
 
   const handleMove = useCallback((id, x, y) => {
+    const nx = Number(x);
+    const ny = Number(y);
+    if (!Number.isFinite(nx) || !Number.isFinite(ny)) return;
+
     setNotes(prev => {
       const moving = prev.find(n => n.id === id);
       if (!moving) return prev;
 
       if (moving.style === 'sticker') {
-        // On drop, check if sticker landed on a note and attach it
-        const NOTE_W = 210, NOTE_H = 200;
-        const target = prev.find(n =>
-          n.id !== id && n.style !== 'sticker' &&
-          x > n.x - 30 && x < n.x + NOTE_W + 30 &&
-          y > n.y - 30 && y < n.y + NOTE_H + 30
-        );
+        const target = prev.find(n => {
+          if (n.id === id || n.style === 'sticker') return false;
+          const { width: w, height: h } = getCardSize(n);
+          return nx > n.x - 30 && nx < n.x + w + 30 && ny > n.y - 30 && ny < n.y + h + 30;
+        });
         return prev.map(n => n.id === id
-          ? { ...n, x, y, attachedTo: target?.id ?? null }
+          ? { ...n, x: nx, y: ny, attachedTo: target?.id ?? null }
           : n
         );
       }
 
       // Regular note: drag attached stickers along with it
-      const dx = x - moving.x;
-      const dy = y - moving.y;
+      const dx = nx - moving.x;
+      const dy = ny - moving.y;
       return prev.map(n => {
-        if (n.id === id) return { ...n, x, y };
+        if (n.id === id) return { ...n, x: nx, y: ny };
         if (n.style === 'sticker' && n.attachedTo === id) return { ...n, x: n.x + dx, y: n.y + dy };
         return n;
       });
@@ -71,6 +75,7 @@ export default function App() {
   }, [setNotes]);
 
   const handleDelete = useCallback((id) => {
+    setSelectedId(prev => (prev === id ? null : prev));
     setNotes(prev => prev.filter(n => n.id !== id));
   }, [setNotes]);
 
@@ -95,25 +100,28 @@ export default function App() {
     if (mode === 'edit' && note.style !== 'sticker') setEditingNote(note);
   }, [mode]);
 
-  const handleAddSticker = useCallback((pick) => {
+  const handleAddSticker = useCallback((imageUrl) => {
     const note = {
       id: uuidv4(),
       style: 'sticker',
-      emoji: pick.type === 'emoji' ? pick.value : null,
-      stickerSrc: pick.type === 'image' ? pick.src : null,
+      imageUrl,
       tag: 'idea',
       title: '',
       body: '',
+      width: 72,
+      height: 72,
       x: Math.max(0, (300 - pan.x) / scale + Math.random() * 400),
       y: Math.max(0, (150 - pan.y) / scale + Math.random() * 200),
       rot: (Math.random() - 0.5) * 8,
     };
     setNotes(prev => [...prev, note]);
+    setSelectedId(note.id);
     setStickerPickerOpen(false);
   }, [pan, scale, setNotes]);
 
   const handleCanvasMouseDown = useCallback((e) => {
     if (e.target !== canvasRef.current && !e.target.classList.contains('canvas-inner')) return;
+    setSelectedId(null);
     panState.current = { startX: e.clientX - pan.x, startY: e.clientY - pan.y };
     canvasRef.current.style.cursor = 'grabbing';
   }, [pan]);
@@ -203,6 +211,8 @@ export default function App() {
               scale={scale}
               mode={mode}
               onCardClick={handleCardClick}
+              selected={selectedId === note.id}
+              onSelect={setSelectedId}
             />
           ))}
         </div>
@@ -216,11 +226,16 @@ export default function App() {
       </div>
 
       <div className={styles.hint}>
-        {mode === 'drag' ? 'drag to pan · scroll to zoom · n to add · e to edit' : 'click a note to edit · d to drag'}
+      {mode === 'drag'
+          ? 'drag to pan · scroll to zoom · select a note to rotate or resize · press n to add'
+          : 'click a note to edit · drag canvas to pan'}
       </div>
 
       {stickerPickerOpen && (
-        <StickerPicker onPick={handleAddSticker} onClose={() => setStickerPickerOpen(false)} />
+        <StickerPicker
+          onPick={handleAddSticker}
+          onClose={() => setStickerPickerOpen(false)}
+        />
       )}
 
       <AddNoteModal
