@@ -14,6 +14,9 @@
   box-shadow: 4px 8px 28px rgba(0,0,0,0.18);
   padding: 14px 16px 16px;
   width: 280px;
+  max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
   font-family: 'Caveat', cursive;
 }
 
@@ -46,6 +49,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
+  overflow-y: auto;
 }
 
 .stickerBtn {
