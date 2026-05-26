@@ -1,6 +1,9 @@
 import paper1 from './assets/paper-1.png';
 import paper2 from './assets/paper-2.png';
 import paper3 from './assets/paper-3.png';
+import paper4 from './assets/paper-4.jpg';
+import paper5 from './assets/paper-5.jpg';
+import paper6 from './assets/paper-6.webp';
 
 const stickerModules = import.meta.glob('./assets/stickers/*.{png,jpg,jpeg,webp,gif}', { eager: true });
 export const STICKER_ASSETS = Object.entries(stickerModules).map(([path, m]) => ({
@@ -13,6 +16,9 @@ export const PAPER_TEXTURES = [
   { id: 'paper-1', src: paper1, label: 'paper 1' },
   { id: 'paper-2', src: paper2, label: 'paper 2' },
   { id: 'paper-3', src: paper3, label: 'paper 3' },
+  { id: 'paper-4', src: paper4, label: 'paper 4' },
+  { id: 'paper-5', src: paper5, label: 'paper 5' },
+  { id: 'paper-6', src: paper6, label: 'paper 6' },
 ];
 
 export const PAPER_COLORS = [
