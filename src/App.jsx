@@ -37,7 +37,33 @@ export default function App() {
   const visibleCount = notes.filter(isVisible).length;
 
   const handleMove = useCallback((id, x, y) => {
-    setNotes(prev => prev.map(n => n.id === id ? { ...n, x, y } : n));
+    setNotes(prev => {
+      const moving = prev.find(n => n.id === id);
+      if (!moving) return prev;
+
+      if (moving.style === 'sticker') {
+        // On drop, check if sticker landed on a note and attach it
+        const NOTE_W = 210, NOTE_H = 200;
+        const target = prev.find(n =>
+          n.id !== id && n.style !== 'sticker' &&
+          x > n.x - 30 && x < n.x + NOTE_W + 30 &&
+          y > n.y - 30 && y < n.y + NOTE_H + 30
+        );
+        return prev.map(n => n.id === id
+          ? { ...n, x, y, attachedTo: target?.id ?? null }
+          : n
+        );
+      }
+
+      // Regular note: drag attached stickers along with it
+      const dx = x - moving.x;
+      const dy = y - moving.y;
+      return prev.map(n => {
+        if (n.id === id) return { ...n, x, y };
+        if (n.style === 'sticker' && n.attachedTo === id) return { ...n, x: n.x + dx, y: n.y + dy };
+        return n;
+      });
+    });
   }, [setNotes]);
 
   const handleDelete = useCallback((id) => {

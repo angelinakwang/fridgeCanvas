@@ -47,11 +47,13 @@
   padding: 4px;
   width: auto;
   min-height: auto;
+  z-index: 60 !important;
 }
 
 .card_sticker:hover {
   box-shadow: none !important;
   transform: rotate(var(--rot, 0deg)) scale(1.12);
+  z-index: 60 !important;
 }
 
 .stickerEmoji {
