@@ -290,6 +290,9 @@
   line-height: 1.2;
   overflow-wrap: break-word;
   word-break: break-word;
+  padding: 5%;
+  margin-right: 20px;
+  margin-left: 20px;
 }
 
 .body {
@@ -299,6 +302,9 @@
   line-height: 1.45;
   overflow-wrap: break-word;
   word-break: break-word;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding: 5%;
 }
 
 .tag {
