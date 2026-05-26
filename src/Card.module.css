@@ -27,6 +27,15 @@
 }
 
 /* styles */
+.card_textured {
+  width: 180px;
+  min-height: 220px;
+  padding: 32px 18px 36px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  box-shadow: 3px 5px 16px rgba(0,0,0,0.14);
+}
+
 .card_sticky {
   width: 168px;
   min-height: 148px;

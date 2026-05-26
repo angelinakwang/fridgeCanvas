@@ -40,10 +40,10 @@ export default function App() {
     setNotes(prev => prev.filter(n => n.id !== id));
   }, [setNotes]);
 
-  const handleAdd = useCallback(({ title, body, tag, style, paperColor, accentColor, imageUrl }) => {
+  const handleAdd = useCallback(({ title, body, tag, style, paperColor, accentColor, imageUrl, paperTexture }) => {
     const note = {
       id: uuidv4(),
-      title, body, tag, style, paperColor, accentColor, imageUrl,
+      title, body, tag, style, paperColor, accentColor, imageUrl, paperTexture,
       x: Math.max(0, (200 - pan.x) / scale + Math.random() * 300),
       y: Math.max(0, (120 - pan.y) / scale + Math.random() * 180),
       rot: (Math.random() - 0.5) * 4.5,

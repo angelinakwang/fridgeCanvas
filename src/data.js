@@ -1,3 +1,7 @@
+export const PAPER_TEXTURES = [
+  { id: 'paper-1', src: '/assets/paper-1.png', label: 'notebook' },
+];
+
 export const PAPER_COLORS = [
   '#faf7ee', '#fef0f5', '#edf3fe', '#ecf7ef',
   '#fef9e7', '#f3eefe', '#f5f5f5', '#1f1f1f',

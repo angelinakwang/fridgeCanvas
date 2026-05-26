@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ALL_TAGS, ALL_STYLES, TAG_COLORS, PAPER_COLORS, ACCENT_COLORS } from './data';
+import { ALL_TAGS, ALL_STYLES, TAG_COLORS, PAPER_COLORS, ACCENT_COLORS, PAPER_TEXTURES } from './data';
 import styles from './Modal.module.css';
 
 function resizeImage(file, maxPx = 480) {
@@ -21,6 +21,8 @@ function resizeImage(file, maxPx = 480) {
   });
 }
 
+const DEFAULT_TEXTURE = PAPER_TEXTURES[0]?.id ?? null;
+
 export default function AddNoteModal({ open, onClose, onAdd }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -29,6 +31,7 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
   const [paperColor, setPaperColor] = useState(null);
   const [accentColor, setAccentColor] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
+  const [paperTexture, setPaperTexture] = useState(DEFAULT_TEXTURE);
   const titleRef = useRef(null);
   const fileRef = useRef(null);
 
@@ -36,6 +39,7 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
     if (open) {
       setTitle(''); setBody(''); setTag('wishlist'); setStyle('sticky');
       setPaperColor(null); setAccentColor(null); setImageUrl(null);
+      setPaperTexture(DEFAULT_TEXTURE);
       setTimeout(() => titleRef.current?.focus(), 50);
     }
   }, [open]);
@@ -55,7 +59,7 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
 
   const handleSave = () => {
     if (!title.trim() && !body.trim() && !imageUrl) { titleRef.current?.focus(); return; }
-    onAdd({ title: title.trim(), body: body.trim(), tag, style, paperColor, accentColor, imageUrl });
+    onAdd({ title: title.trim(), body: body.trim(), tag, style, paperColor, accentColor, imageUrl, paperTexture });
     onClose();
   };
 
@@ -100,59 +104,86 @@ export default function AddNoteModal({ open, onClose, onAdd }) {
         </div>
 
         <div className={styles.field}>
-          <label>style</label>
-          <div className={styles.chips}>
-            {ALL_STYLES.map(s => (
+          <label>paper</label>
+          <div className={styles.texturePicker}>
+            {/* "none" option */}
+            <button
+              className={[styles.textureOption, paperTexture === null ? styles.textureOptionActive : ''].join(' ')}
+              onClick={() => setPaperTexture(null)}
+            >
+              <div className={styles.textureNone}>none</div>
+            </button>
+            {PAPER_TEXTURES.map(t => (
               <button
-                key={s}
-                onClick={() => setStyle(s)}
-                className={[styles.chip, style === s ? styles.chipActive : ''].join(' ')}
+                key={t.id}
+                className={[styles.textureOption, paperTexture === t.id ? styles.textureOptionActive : ''].join(' ')}
+                onClick={() => setPaperTexture(t.id)}
+                title={t.label}
               >
-                {s}
+                <img src={t.src} alt={t.label} className={styles.textureThumbnail} />
+                <span className={styles.textureLabel}>{t.label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        <div className={styles.field}>
-          <label>paper</label>
-          <div className={styles.swatches}>
-            <button
-              className={[styles.swatch, styles.swatchAuto, paperColor === null ? styles.swatchActive : ''].join(' ')}
-              onClick={() => setPaperColor(null)}
-              title="tag default"
-            />
-            {PAPER_COLORS.map(c => (
-              <button
-                key={c}
-                className={[styles.swatch, paperColor === c ? styles.swatchActive : ''].join(' ')}
-                style={{ background: c }}
-                onClick={() => setPaperColor(c)}
-                title={c}
-              />
-            ))}
-          </div>
-        </div>
+        {/* style + color only shown when no texture is selected */}
+        {!paperTexture && (
+          <>
+            <div className={styles.field}>
+              <label>style</label>
+              <div className={styles.chips}>
+                {ALL_STYLES.map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setStyle(s)}
+                    className={[styles.chip, style === s ? styles.chipActive : ''].join(' ')}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        <div className={styles.field}>
-          <label>{accentLabel}</label>
-          <div className={styles.swatches}>
-            <button
-              className={[styles.swatch, styles.swatchAuto, accentColor === null ? styles.swatchActive : ''].join(' ')}
-              onClick={() => setAccentColor(null)}
-              title="default"
-            />
-            {ACCENT_COLORS.map(c => (
-              <button
-                key={c}
-                className={[styles.swatch, accentColor === c ? styles.swatchActive : ''].join(' ')}
-                style={{ background: c }}
-                onClick={() => setAccentColor(c)}
-                title={c}
-              />
-            ))}
-          </div>
-        </div>
+            <div className={styles.field}>
+              <label>paper color</label>
+              <div className={styles.swatches}>
+                <button
+                  className={[styles.swatch, styles.swatchAuto, paperColor === null ? styles.swatchActive : ''].join(' ')}
+                  onClick={() => setPaperColor(null)}
+                  title="tag default"
+                />
+                {PAPER_COLORS.map(c => (
+                  <button
+                    key={c}
+                    className={[styles.swatch, paperColor === c ? styles.swatchActive : ''].join(' ')}
+                    style={{ background: c }}
+                    onClick={() => setPaperColor(c)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className={styles.field}>
+              <label>{accentLabel}</label>
+              <div className={styles.swatches}>
+                <button
+                  className={[styles.swatch, styles.swatchAuto, accentColor === null ? styles.swatchActive : ''].join(' ')}
+                  onClick={() => setAccentColor(null)}
+                  title="default"
+                />
+                {ACCENT_COLORS.map(c => (
+                  <button
+                    key={c}
+                    className={[styles.swatch, accentColor === c ? styles.swatchActive : ''].join(' ')}
+                    style={{ background: c }}
+                    onClick={() => setAccentColor(c)}
+                  />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
 
         <div className={styles.field}>
           <label>image <span className={styles.opt}>(optional)</span></label>

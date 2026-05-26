@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react';
-import { TAG_COLORS, INDEX_BORDERS, PIN_COLORS } from './data';
+import { TAG_COLORS, INDEX_BORDERS, PIN_COLORS, PAPER_TEXTURES } from './data';
 import styles from './Card.module.css';
 
 function hashId(id) {
@@ -50,9 +50,13 @@ export default function Card({ note, onMove, onDelete, hidden, scale }) {
     document.addEventListener('mouseup', onUp);
   }, [note, scale, onMove]);
 
+  const texture = note.paperTexture
+    ? PAPER_TEXTURES.find(t => t.id === note.paperTexture)
+    : null;
+
   const cardClass = [
     styles.card,
-    styles[`card_${note.style}`],
+    texture ? styles.card_textured : styles[`card_${note.style}`],
     hidden ? styles.hidden : '',
   ].join(' ');
 
@@ -62,8 +66,13 @@ export default function Card({ note, onMove, onDelete, hidden, scale }) {
     left: note.x,
     top: note.y,
     '--rot': `${note.rot || 0}deg`,
-    ...(paperBg ? { background: paperBg } : {}),
-    ...(note.style === 'index' ? { borderTopColor: INDEX_BORDERS[note.tag] || '#ccc' } : {}),
+    ...(texture
+      ? { backgroundImage: `url(${texture.src})` }
+      : {
+          ...(paperBg ? { background: paperBg } : {}),
+          ...(note.style === 'index' ? { borderTopColor: INDEX_BORDERS[note.tag] || '#ccc' } : {}),
+        }
+    ),
   };
 
   const pinColor = note.accentColor || PIN_COLORS[hashId(note.id) % PIN_COLORS.length];
@@ -76,11 +85,11 @@ export default function Card({ note, onMove, onDelete, hidden, scale }) {
       style={cardStyle}
       onMouseDown={handleMouseDown}
     >
-      {/* decorations */}
-      {(note.style === 'sticky' || note.style === 'index') && (
+      {/* decorations — hidden for textured cards (image has its own decoration) */}
+      {!texture && (note.style === 'sticky' || note.style === 'index') && (
         <div className={styles.pin} style={{ background: pinColor }} />
       )}
-      {(note.style === 'torn' || note.style === 'envelope') && (
+      {!texture && (note.style === 'torn' || note.style === 'envelope') && (
         <div className={styles.tape} style={tapeStyle} />
       )}
 
