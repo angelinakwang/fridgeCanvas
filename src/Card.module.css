@@ -227,6 +227,8 @@
   color: #1a1a1a;
   margin-bottom: 5px;
   line-height: 1.2;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .body {
@@ -234,6 +236,8 @@
   font-size: 14px;
   color: #333;
   line-height: 1.45;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .tag {
