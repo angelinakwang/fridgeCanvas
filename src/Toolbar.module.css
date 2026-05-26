@@ -1,0 +1,116 @@
+.toolbar {
+  background: #faf9f5;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  z-index: 100;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.logo {
+  font-family: 'Special Elite', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: #1a1a1a;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.sep {
+  width: 1px;
+  height: 24px;
+  background: #ddd;
+  flex-shrink: 0;
+}
+
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  color: #aaa;
+}
+
+.searchWrap svg {
+  position: absolute;
+  left: 8px;
+  pointer-events: none;
+}
+
+.search {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  padding: 4px 12px 4px 28px;
+  width: 160px;
+  background: #fff;
+  color: #1a1a1a;
+  outline: none;
+  transition: border-color 0.15s, width 0.2s;
+}
+
+.search:focus { border-color: #999; width: 200px; }
+.search::placeholder { color: #bbb; }
+
+.filterBar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filterLabel {
+  font-size: 12px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-family: 'Caveat', cursive;
+}
+
+.pill {
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  padding: 3px 12px;
+  border-radius: 20px;
+  border: 1.5px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.13s;
+  white-space: nowrap;
+}
+
+.pill:hover { border-color: #aaa; }
+
+.pillActive {
+  border-color: #1a1a1a;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.count {
+  font-size: 13px;
+  color: #aaa;
+  font-family: 'Caveat', cursive;
+  white-space: nowrap;
+}
+
+.addBtn {
+  margin-left: auto;
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.13s;
+}
+
+.addBtn:hover { background: #333; }

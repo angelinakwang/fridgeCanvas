@@ -1,0 +1,127 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.32);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: #faf9f5;
+  border-radius: 6px;
+  padding: 26px 28px;
+  width: 360px;
+  box-shadow: 5px 10px 30px rgba(0,0,0,0.22);
+  font-family: 'Caveat', cursive;
+}
+
+.heading {
+  font-family: 'Special Elite', serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 18px;
+  color: #1a1a1a;
+}
+
+.field {
+  margin-bottom: 14px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.opt {
+  font-size: 11px;
+  color: #ccc;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 7px 10px;
+  background: #fff;
+  color: #1a1a1a;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.13s;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: #aaa;
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  padding: 3px 11px;
+  border-radius: 20px;
+  border: 1.5px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.13s;
+}
+
+.chip:hover { border-color: #aaa; }
+
+.chipActive {
+  border-color: #1a1a1a;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.save {
+  flex: 1;
+  font-family: 'Caveat', cursive;
+  font-size: 17px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  padding: 9px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.13s;
+}
+
+.save:hover { background: #333; }
+
+.cancel {
+  font-family: 'Caveat', cursive;
+  font-size: 17px;
+  background: transparent;
+  color: #999;
+  border: 1px solid #ddd;
+  padding: 9px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: border-color 0.13s;
+}
+
+.cancel:hover { border-color: #aaa; color: #666; }
