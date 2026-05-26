@@ -95,11 +95,12 @@ export default function App() {
     if (mode === 'edit' && note.style !== 'sticker') setEditingNote(note);
   }, [mode]);
 
-  const handleAddSticker = useCallback((emoji) => {
+  const handleAddSticker = useCallback((pick) => {
     const note = {
       id: uuidv4(),
       style: 'sticker',
-      emoji,
+      emoji: pick.type === 'emoji' ? pick.value : null,
+      stickerSrc: pick.type === 'image' ? pick.src : null,
       tag: 'idea',
       title: '',
       body: '',

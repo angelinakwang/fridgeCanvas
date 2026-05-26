@@ -63,6 +63,15 @@
   user-select: none;
 }
 
+.stickerImage {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+}
+
 .editMode {
   cursor: pointer !important;
 }

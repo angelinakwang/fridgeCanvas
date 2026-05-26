@@ -2,6 +2,9 @@ import paper1 from './assets/paper-1.png';
 import paper2 from './assets/paper-2.png';
 import paper3 from './assets/paper-3.png';
 
+const stickerModules = import.meta.glob('./assets/stickers/*.{png,jpg,jpeg,webp,gif}', { eager: true });
+export const IMAGE_STICKERS = Object.values(stickerModules).map(m => m.default);
+
 export const STICKER_EMOJIS = [
   '🌸', '🌺', '🌻', '🌼', '🌷', '🍀', '🍁', '🍂',
   '🦋', '🐝', '🌙', '⭐', '💫', '✨', '🌈', '☁️',

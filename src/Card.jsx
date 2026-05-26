@@ -102,7 +102,10 @@ export default function Card({ note, onMove, onUpdate, onDelete, hidden, scale, 
         style={{ left: note.x, top: note.y, '--rot': `${note.rot || 0}deg` }}
         onMouseDown={handleMouseDown}
       >
-        <span className={styles.stickerEmoji}>{note.emoji}</span>
+        {note.stickerSrc
+          ? <img src={note.stickerSrc} alt="" className={styles.stickerImage} draggable={false} />
+          : <span className={styles.stickerEmoji}>{note.emoji}</span>
+        }
         <button
           className={styles.delete}
           data-delete="true"
