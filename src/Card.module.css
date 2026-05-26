@@ -9,14 +9,14 @@
 
 .card:hover {
   z-index: 50;
-  transform: rotate(var(--rot, 0deg)) scale(1.05) translateY(-5px);
-  box-shadow: 10px 20px 40px rgba(0,0,0,0.22) !important;
+  transform: rotate(var(--rot, 0deg)) scale(1.04);
+  box-shadow: 8px 16px 32px rgba(0,0,0,0.2) !important;
 }
 
 .dragging {
   z-index: 999 !important;
   box-shadow: 6px 12px 28px rgba(0,0,0,0.22) !important;
-  transform: rotate(var(--rot, 0deg)) scale(1.02) !important;
+  transform: rotate(var(--rot, 0deg)) !important;
   transition: none !important;
 }
 
